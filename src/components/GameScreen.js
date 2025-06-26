@@ -71,6 +71,11 @@ function GameScreen({ playerIndex, players, gameState, wordInput, setWordInput, 
   const overTries = gameState.round > maxTries;
   const allTimeHigh = gameState.highScore || '-';
   const synergyScoreboard = gameState.synergyScoreboard || [];
+  const you = players[playerIndex]?.name || '';
+  const partner = players[1 - playerIndex]?.name || '';
+  // Find synergy entry for you and partner
+  const getSynergyKey = (a, b) => [a.trim().toLowerCase(), b.trim().toLowerCase()].sort().join('|');
+  const synergyEntry = synergyScoreboard.find(entry => getSynergyKey(entry.names[0], entry.names[1]) === getSynergyKey(you, partner));
   return (
     <div className="game-bg">
       <div className="game-main-layout">
@@ -79,6 +84,11 @@ function GameScreen({ playerIndex, players, gameState, wordInput, setWordInput, 
             <h2 className="game-title">{GAME_NAME}</h2>
             <div className="high-score">🏆 All-Time Best: <b>{allTimeHigh === '-' ? '-' : `${allTimeHigh} guesses`}</b></div>
           </div>
+          {synergyEntry && partner && (
+            <div className="synergy-best-row" style={{marginBottom:12, color:'#27ae60', fontWeight:700}}>
+              Best with <b>{partner}</b>: {synergyEntry.score} guesses, Synergy {synergyEntry.percent}%
+            </div>
+          )}
           <div className="round-history-label">Round History</div>
           <div className="round-history-table-wrap">
             <table className="round-history-table">
@@ -97,35 +107,6 @@ function GameScreen({ playerIndex, players, gameState, wordInput, setWordInput, 
                     <td>{words[1]}</td>
                   </tr>
                 ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="synergy-scoreboard-label" style={{marginTop:24, fontWeight:700, color:'#8e44ad', fontSize:18}}>Synergy Scoreboard</div>
-          <div className="synergy-scoreboard-table-wrap">
-            <table className="synergy-scoreboard-table">
-              <thead>
-                <tr>
-                  <th>Partner</th>
-                  <th>Best Score</th>
-                  <th>Synergy %</th>
-                </tr>
-              </thead>
-              <tbody>
-                {synergyScoreboard.length === 0 ? (
-                  <tr><td colSpan={3} style={{color:'#aaa'}}>No synergy data yet</td></tr>
-                ) : (
-                  synergyScoreboard.map((entry, i) => {
-                    // Show the partner's name (not you)
-                    const partner = entry.names.find(n => n.toLowerCase() !== (players[playerIndex]?.name || '').toLowerCase()) || entry.names[0];
-                    return (
-                      <tr key={i}>
-                        <td>{partner}</td>
-                        <td>{entry.score} guesses</td>
-                        <td>{entry.percent}%</td>
-                      </tr>
-                    );
-                  })
-                )}
               </tbody>
             </table>
           </div>

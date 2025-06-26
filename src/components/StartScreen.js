@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './StartScreen.css';
 
 const AVATARS = [
@@ -30,8 +30,45 @@ function BouncingAvatars() {
   );
 }
 
-function StartScreen({ nameInput, setNameInput, setName, maxTries, setMaxTries, players }) {
-  const waiting = players.length === 1;
+function SynergyScoreboardModal({ open, onClose, synergyScoreboard }) {
+  if (!open) return null;
+  return (
+    <div className="synergy-modal-overlay">
+      <div className="synergy-modal-card">
+        <h2 className="synergy-modal-title">Synergy Scoreboard</h2>
+        <div className="synergy-scoreboard-table-wrap">
+          <table className="synergy-scoreboard-table">
+            <thead>
+              <tr>
+                <th>Partner</th>
+                <th>Best Score</th>
+                <th>Synergy %</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(!synergyScoreboard || synergyScoreboard.length === 0) ? (
+                <tr><td colSpan={3} style={{color:'#aaa'}}>No synergy data yet</td></tr>
+              ) : (
+                synergyScoreboard.map((entry, i) => (
+                  <tr key={i}>
+                    <td>{entry.names.join(' & ')}</td>
+                    <td>{entry.score} guesses</td>
+                    <td>{entry.percent}%</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+        <button className="synergy-modal-close-btn" onClick={onClose}>Close</button>
+      </div>
+    </div>
+  );
+}
+
+function StartScreen({ nameInput, setNameInput, setName, maxTries, setMaxTries, players, waiting, synergyScoreboard }) {
+  const [modalOpen, setModalOpen] = useState(false);
+  const waitingForPlayer = players.length === 1 || waiting;
   return (
     <div className="start-bg">
       <div className="start-content">
@@ -67,8 +104,12 @@ function StartScreen({ nameInput, setNameInput, setName, maxTries, setMaxTries, 
         >
           Start Game
         </button>
-        {waiting && <div className="waiting-effect"><span className="dot-flashing"></span> Waiting for second player...</div>}
+        <button className="synergy-scoreboard-btn" onClick={() => setModalOpen(true)}>
+          Synergy Scoreboard
+        </button>
+        {waitingForPlayer && <div className="waiting-effect"><span className="dot-flashing"></span> Waiting for second player...</div>}
       </div>
+      <SynergyScoreboardModal open={modalOpen} onClose={() => setModalOpen(false)} synergyScoreboard={synergyScoreboard} />
       <footer className="start-footer">
         <div>© 2025 Karthik Nambiar</div>
         <div className="disclaimer">This game concept ('Mind Meld') is inspired by popular word association and mind-matching games. This is a personal, non-commercial project. All rights to original concepts belong to their respective creators.</div>
