@@ -170,4 +170,119 @@ body, html, #root, .start-bg {
   max-width: 90vw;
   margin: 0 auto;
   line-height: 1.4;
+}
+
+.synergy-scoreboard-btn {
+  margin-top: 16px;
+  font-size: 18px;
+  padding: 10px 28px;
+  border-radius: 10px;
+  background: linear-gradient(90deg,#e67e22,#8e44ad);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 800;
+  box-shadow: 0 2px 8px #8e44ad20;
+  letter-spacing: 1px;
+  transition: background 0.2s, transform 0.2s;
+}
+.synergy-scoreboard-btn:hover {
+  background: linear-gradient(90deg,#8e44ad,#e67e22);
+  transform: scale(1.04);
+}
+
+.synergy-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(40, 16, 60, 0.18);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+}
+.synergy-modal-card {
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 8px 48px #8e44ad33;
+  padding: 36px 18px 24px 18px;
+  min-width: 320px;
+  max-width: 95vw;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2001;
+  animation: popIn 0.4s cubic-bezier(.68,-0.55,.27,1.55);
+}
+.synergy-modal-title {
+  font-size: 26px;
+  font-weight: 900;
+  color: #8e44ad;
+  margin-bottom: 18px;
+  text-align: center;
+}
+.synergy-scoreboard-table-wrap {
+  width: 100%;
+  max-height: 260px;
+  overflow-y: auto;
+  margin-bottom: 18px;
+}
+.synergy-scoreboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 10px;
+  font-size: 16px;
+}
+.synergy-scoreboard-table th, .synergy-scoreboard-table td {
+  padding: 10px 8px;
+  text-align: center;
+}
+.synergy-scoreboard-table th {
+  background: #e3e6f3;
+  color: #8e44ad;
+  font-weight: 900;
+  font-size: 16px;
+}
+.synergy-scoreboard-table tr:nth-child(even) {
+  background: #f3e6ff;
+}
+.synergy-scoreboard-table tr:nth-child(odd) {
+  background: #fff;
+}
+.synergy-modal-close-btn {
+  font-size: 18px;
+  padding: 10px 32px;
+  border-radius: 10px;
+  background: linear-gradient(90deg,#e67e22,#8e44ad);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 800;
+  box-shadow: 0 2px 8px #8e44ad20;
+  letter-spacing: 1px;
+  margin-top: 8px;
+  transition: background 0.2s, transform 0.2s;
+}
+.synergy-modal-close-btn:hover {
+  background: linear-gradient(90deg,#8e44ad,#e67e22);
+  transform: scale(1.04);
+}
+@media (max-width: 600px) {
+  .synergy-modal-card {
+    min-width: 0;
+    width: 98vw;
+    padding: 18px 2vw 18px 2vw;
+  }
+  .synergy-modal-title {
+    font-size: 20px;
+  }
+  .synergy-scoreboard-table th, .synergy-scoreboard-table td {
+    font-size: 14px;
+    padding: 7px 2px;
+  }
 } 

@@ -19,6 +19,13 @@ function App() {
   const [submitted, setSubmitted] = useState(false);
   const [maxTries, setMaxTries] = useState(15);
   const [socket, setSocket] = useState(null);
+  const [synergyScoreboard, setSynergyScoreboard] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('mindmeld_synergy') || '[]');
+    } catch {
+      return [];
+    }
+  });
 
   useEffect(() => {
     if (!name) return;
@@ -30,9 +37,34 @@ function App() {
       setGameState(state);
       setSubmitted(false);
       setWordInput('');
+      if (state.win && state.synergyScoreboard) {
+        const you = name;
+        const partner = players.find(p => p.name && p.name !== you)?.name;
+        if (partner) {
+          const getSynergyKey = (a, b) => [a.trim().toLowerCase(), b.trim().toLowerCase()].sort().join('|');
+          const key = getSynergyKey(you, partner);
+          const entry = state.synergyScoreboard.find(e => getSynergyKey(e.names[0], e.names[1]) === key);
+          if (entry) {
+            setSynergyScoreboard(prev => {
+              const prevMap = Object.fromEntries(prev.map(e => [getSynergyKey(e.names[0], e.names[1]), e]));
+              if (!prevMap[key] || entry.score < prevMap[key].score) {
+                const updated = { ...entry };
+                const newArr = prev.filter(e => getSynergyKey(e.names[0], e.names[1]) !== key).concat([updated]);
+                localStorage.setItem('mindmeld_synergy', JSON.stringify(newArr));
+                return newArr;
+              }
+              return prev;
+            });
+          }
+        }
+      }
     });
-    s.on('full', () => {
-      alert('Room is full!');
+    s.on('full', (data) => {
+      if (data && data.players && data.players.length === 2) {
+        alert(`Room is full. ${data.players[0]} and ${data.players[1]} are playing.`);
+      } else {
+        alert('Room is full!');
+      }
     });
     s.emit('set_name', { name, maxTries });
     return () => s.disconnect();
@@ -59,6 +91,7 @@ function App() {
         setMaxTries={setMaxTries}
         players={players}
         waiting={gameState.waiting}
+        synergyScoreboard={synergyScoreboard}
       />
     );
   }

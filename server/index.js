@@ -70,7 +70,9 @@ io.on('connection', (socket) => {
   // On set_name, add to players if room is not full
   socket.on('set_name', (data) => {
     if (Object.keys(players).length >= 2) {
-      socket.emit('full');
+      // Send names of current players
+      const currentNames = Object.values(players).map(p => p.name).filter(Boolean);
+      socket.emit('full', { players: currentNames });
       socket.disconnect();
       return;
     }
