@@ -15,7 +15,7 @@ function App() {
   const [name, setName] = useState('');
   const [nameInput, setNameInput] = useState('');
   const [wordInput, setWordInput] = useState('');
-  const [gameState, setGameState] = useState({ roundWords: [], highScore: 0, gameActive: false, round: 1, win: false });
+  const [gameState, setGameState] = useState({ roundWords: [], highScore: 0, gameActive: false, round: 1, win: false, waiting: false });
   const [submitted, setSubmitted] = useState(false);
   const [maxTries, setMaxTries] = useState(15);
   const socketRef = useRef(null);
@@ -62,7 +62,17 @@ function App() {
         maxTries={maxTries}
         setMaxTries={setMaxTries}
         players={players}
+        waiting={gameState.waiting}
       />
+    );
+  }
+
+  if (gameState.waiting) {
+    return (
+      <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',height:'100vh',background:'#f3e6ff'}}>
+        <h2 style={{color:'#8e44ad',fontWeight:900,marginBottom:16}}>Waiting for Player 2...</h2>
+        <div className="dot-flashing" style={{margin:'0 auto'}}></div>
+      </div>
     );
   }
 
