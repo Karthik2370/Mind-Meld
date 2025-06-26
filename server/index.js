@@ -27,9 +27,34 @@ let highScore = 0;
 let gameActive = false;
 let maxTries = 0;
 let gameStarted = false;
+let synergyScores = {}; // { 'alice|bob': { score: 3, names: ['Alice', 'Bob'] } }
+let allTimeHighScore = null; // lowest number of guesses to win
 
 function getPlayerList() {
   return Object.values(players).map(p => ({ name: p.name, id: p.id, index: p.index }));
+}
+
+function getSynergyKey(name1, name2) {
+  // Lowercase, sorted
+  return [name1.trim().toLowerCase(), name2.trim().toLowerCase()].sort().join('|');
+}
+
+function updateSynergyScore(name1, name2, guesses, maxTries) {
+  const key = getSynergyKey(name1, name2);
+  if (!synergyScores[key] || guesses < synergyScores[key].score) {
+    synergyScores[key] = {
+      score: guesses,
+      names: [name1, name2],
+      percent: Math.max(0, Math.round(100 * (1 - (guesses-1)/(maxTries-1))) )
+    };
+  }
+  if (allTimeHighScore === null || guesses < allTimeHighScore) {
+    allTimeHighScore = guesses;
+  }
+}
+
+function getSynergyScoreboard() {
+  return Object.values(synergyScores);
 }
 
 function resetGame() {
@@ -69,10 +94,10 @@ io.on('connection', (socket) => {
       Object.values(players).every(p => typeof p.name === 'string' && p.name)
     ) {
       resetGame();
-      io.emit('game_state', { roundWords, highScore, gameActive, round: roundWords.length + 1, maxTries });
+      io.emit('game_state', { roundWords, highScore: allTimeHighScore, gameActive, round: roundWords.length + 1, maxTries });
     } else {
       // If only one player, emit waiting state
-      io.emit('game_state', { waiting: true, gameActive: false, roundWords, highScore, round: 1, maxTries });
+      io.emit('game_state', { waiting: true, gameActive: false, roundWords, highScore: allTimeHighScore, round: 1, maxTries });
     }
   });
 
@@ -86,21 +111,45 @@ io.on('connection', (socket) => {
       if (words[0] && words[1] && words[0].toLowerCase() === words[1].toLowerCase()) {
         gameActive = false;
         gameStarted = false;
-        if (roundWords.length > highScore) highScore = roundWords.length;
-        io.emit('game_state', { roundWords, highScore, gameActive, win: true, round: roundWords.length });
+        const playerNames = Object.values(players).map(p => p.name);
+        const guesses = roundWords.length;
+        updateSynergyScore(playerNames[0], playerNames[1], guesses, maxTries);
+        io.emit('game_state', {
+          roundWords,
+          highScore: allTimeHighScore,
+          synergyScoreboard: getSynergyScoreboard(),
+          gameActive,
+          win: true,
+          round: roundWords.length,
+          maxTries
+        });
       } else {
         currentWords = {};
-        io.emit('game_state', { roundWords, highScore, gameActive, round: roundWords.length + 1 });
+        io.emit('game_state', {
+          roundWords,
+          highScore: allTimeHighScore,
+          synergyScoreboard: getSynergyScoreboard(),
+          gameActive,
+          round: roundWords.length + 1,
+          maxTries
+        });
       }
     } else {
-      io.emit('game_state', { roundWords, highScore, gameActive, round: roundWords.length + 1 });
+      io.emit('game_state', {
+        roundWords,
+        highScore: allTimeHighScore,
+        synergyScoreboard: getSynergyScoreboard(),
+        gameActive,
+        round: roundWords.length + 1,
+        maxTries
+      });
     }
   });
 
   socket.on('restart', () => {
     if (Object.values(players).length === 2) {
       resetGame();
-      io.emit('game_state', { roundWords, highScore, gameActive, round: 1, maxTries });
+      io.emit('game_state', { roundWords, highScore: allTimeHighScore, gameActive, round: 1, maxTries });
     }
   });
 
@@ -113,9 +162,9 @@ io.on('connection', (socket) => {
       io.emit('players_update', getPlayerList());
       // If only one player left, emit waiting state
       if (Object.keys(players).length === 1) {
-        io.emit('game_state', { waiting: true, gameActive: false, roundWords, highScore, round: 1, maxTries });
+        io.emit('game_state', { waiting: true, gameActive: false, roundWords, highScore: allTimeHighScore, round: 1, maxTries });
       } else {
-        io.emit('game_state', { roundWords, highScore, gameActive, round: roundWords.length + 1 });
+        io.emit('game_state', { roundWords, highScore: allTimeHighScore, gameActive, round: roundWords.length + 1, maxTries });
       }
       console.log('Player disconnected:', socket.id, 'Current players:', Object.keys(players));
     }

@@ -69,13 +69,15 @@ function GameScreen({ playerIndex, players, gameState, wordInput, setWordInput, 
   const isGameOver = !gameState.gameActive && !gameState.win;
   const isVictory = !!gameState.win;
   const overTries = gameState.round > maxTries;
+  const allTimeHigh = gameState.highScore || '-';
+  const synergyScoreboard = gameState.synergyScoreboard || [];
   return (
     <div className="game-bg">
       <div className="game-main-layout">
         <div className="game-left">
           <div className="game-title-row">
             <h2 className="game-title">{GAME_NAME}</h2>
-            <div className="high-score">🏆 High Score: <b>{Math.max(gameState.highScore, Number(localStorage.getItem('mindmeld_highscore') || 0))}</b></div>
+            <div className="high-score">🏆 All-Time Best: <b>{allTimeHigh === '-' ? '-' : `${allTimeHigh} guesses`}</b></div>
           </div>
           <div className="round-history-label">Round History</div>
           <div className="round-history-table-wrap">
@@ -95,6 +97,35 @@ function GameScreen({ playerIndex, players, gameState, wordInput, setWordInput, 
                     <td>{words[1]}</td>
                   </tr>
                 ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="synergy-scoreboard-label" style={{marginTop:24, fontWeight:700, color:'#8e44ad', fontSize:18}}>Synergy Scoreboard</div>
+          <div className="synergy-scoreboard-table-wrap">
+            <table className="synergy-scoreboard-table">
+              <thead>
+                <tr>
+                  <th>Partner</th>
+                  <th>Best Score</th>
+                  <th>Synergy %</th>
+                </tr>
+              </thead>
+              <tbody>
+                {synergyScoreboard.length === 0 ? (
+                  <tr><td colSpan={3} style={{color:'#aaa'}}>No synergy data yet</td></tr>
+                ) : (
+                  synergyScoreboard.map((entry, i) => {
+                    // Show the partner's name (not you)
+                    const partner = entry.names.find(n => n.toLowerCase() !== (players[playerIndex]?.name || '').toLowerCase()) || entry.names[0];
+                    return (
+                      <tr key={i}>
+                        <td>{partner}</td>
+                        <td>{entry.score} guesses</td>
+                        <td>{entry.percent}%</td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>
