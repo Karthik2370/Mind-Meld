@@ -8,7 +8,7 @@ const app = express();
 const server = http.createServer(app);
 const allowedOrigins = [
   'http://localhost:3000',
-  process.env.FRONTEND_ORIGIN || 'https://your-frontend.vercel.app'
+  process.env.FRONTEND_ORIGIN || 'https://mind-meld-game.vercel.app'
 ];
 
 const io = new Server(server, {
