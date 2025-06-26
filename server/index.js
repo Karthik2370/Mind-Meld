@@ -38,8 +38,12 @@ function resetGame() {
 }
 
 io.on('connection', (socket) => {
+  console.log('New connection:', socket.id, 'Current players:', Object.keys(players));
   let index = Object.keys(players).length;
   if (index > 1) {
+    // Reset all players if somehow more than 2 (stale state protection)
+    players = {};
+    console.log('Too many players detected, resetting players object.');
     socket.emit('full');
     socket.disconnect();
     return;
@@ -106,6 +110,7 @@ io.on('connection', (socket) => {
     gameActive = false;
     io.emit('players_update', getPlayerList());
     io.emit('game_state', { roundWords, highScore, gameActive, round: roundWords.length + 1 });
+    console.log('Player disconnected:', socket.id, 'Current players:', Object.keys(players));
   });
 });
 
