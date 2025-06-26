@@ -19,6 +19,8 @@ Track your all-time best, see your Synergy Scoreboard with every partner, and ch
 - **Backend:** [Node.js](https://nodejs.org/) + [Express](https://expressjs.com/) + [Socket.IO](https://socket.io/) (Render hosted)
 - **Real-time Communication:** Socket.IO
 - **Styling:** CSS Modules
+- **Certificate Generation:** [html2canvas](https://www.npmjs.com/package/html2canvas)
+- **Persistence:** LocalStorage (for synergy and high score)
 - **Deployment:** [Vercel](https://vercel.com/) (frontend), [Render](https://render.com/) (backend)
 
 ---
@@ -26,22 +28,26 @@ Track your all-time best, see your Synergy Scoreboard with every partner, and ch
 ## Features
 
 - ⚡ Real-time multiplayer (Socket.IO)
-- 🎨 Modern, responsive UI (React)
+- 🎨 Modern, responsive, and mobile-friendly UI
 - 🏆 All-time best (shortest win) tracking
-- 🤝 Synergy Scoreboard: see your best score and synergy percent with every partner
+- 🤝 Synergy Scoreboard: see your best score and synergy percent with every partner (persists across sessions)
 - 📝 Round history and high score persistence
-- 🖥️ Desktop and mobile friendly
+- 📱 Seamless experience on desktop and mobile
+- 🧠 Name autofill: remembers your name for next time
+- 🥇 Downloadable, roast-filled victory certificate as a PNG (with round history table and your names)
+- 🚨 Room full alert shows the names of the players currently playing
 
 ---
 
 ## How to Play
 
-1. Open [Mind Meld](https://mind-meld-game.vercel.app/) in two devices.
-2. Each player enters their name and selects max tries.
+1. Open [Mind Meld](https://mind-meld-game.vercel.app/) in two devices or browser tabs.
+2. Each player enters their name (autofilled if you’ve played before) and selects max tries.
 3. Each round, both players type a word and submit.
 4. If you both say the same word, you win!
 5. Your best (lowest) number of guesses is tracked as your all-time high score.
-6. The Synergy Scoreboard shows your best result and synergy percent with every partner.
+6. The Synergy Scoreboard (on the Start Screen) shows your best result and synergy percent with every partner.
+7. After a win, download a stylish, roast-filled certificate PNG to show off your victory!
 
 ---
 
