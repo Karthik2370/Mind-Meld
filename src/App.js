@@ -18,39 +18,35 @@ function App() {
   const [gameState, setGameState] = useState({ roundWords: [], highScore: 0, gameActive: false, round: 1, win: false, waiting: false });
   const [submitted, setSubmitted] = useState(false);
   const [maxTries, setMaxTries] = useState(15);
-  const socketRef = useRef(null);
+  const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const socket = io(SERVER_URL);
-    socketRef.current = socket;
-    socket.on('player_index', (idx) => setPlayerIndex(idx));
-    socket.on('players_update', (list) => setPlayers(list));
-    socket.on('game_state', (state) => {
+    if (!name) return;
+    const s = io(SERVER_URL);
+    setSocket(s);
+    s.on('player_index', (idx) => setPlayerIndex(idx));
+    s.on('players_update', (list) => setPlayers(list));
+    s.on('game_state', (state) => {
       setGameState(state);
       setSubmitted(false);
       setWordInput('');
     });
-    socket.on('full', () => {
+    s.on('full', () => {
       alert('Room is full!');
     });
-    return () => socket.disconnect();
-  }, []);
-
-  useEffect(() => {
-    if (name && socketRef.current && playerIndex !== null) {
-      socketRef.current.emit('set_name', { name, maxTries });
-    }
-  }, [name, playerIndex, maxTries]);
+    s.emit('set_name', { name, maxTries });
+    return () => s.disconnect();
+  }, [name, maxTries]);
 
   function handleSubmit(e) {
     e.preventDefault();
     if (!wordInput.trim() || !gameState.gameActive || submitted) return;
-    socketRef.current.emit('submit_word', wordInput.trim());
+    if (socket) socket.emit('submit_word', wordInput.trim());
     setSubmitted(true);
   }
 
   function handleRestart() {
-    socketRef.current.emit('restart');
+    if (socket) socket.emit('restart');
   }
 
   if (!name) {

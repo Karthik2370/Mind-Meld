@@ -41,40 +41,38 @@ function resetGame() {
 
 io.on('connection', (socket) => {
   console.log('New connection:', socket.id, 'Current players:', Object.keys(players));
-  let index = Object.keys(players).length;
-  if (index > 1) {
-    socket.emit('full');
-    socket.disconnect();
-    return;
-  }
-  players[socket.id] = { id: socket.id, index, name: '' };
-  socket.emit('player_index', index);
-  io.emit('players_update', getPlayerList());
 
-  // Emit waiting state if only one player
-  if (Object.keys(players).length === 1) {
-    io.emit('game_state', { waiting: true, gameActive: false, roundWords, highScore, round: 1, maxTries });
-  }
-
+  // On set_name, add to players if room is not full
   socket.on('set_name', (data) => {
-    if (players[socket.id]) {
-      if (typeof data === 'string') {
-        players[socket.id].name = data;
-      } else if (typeof data === 'object' && data !== null) {
-        players[socket.id].name = data.name;
-        if (typeof data.maxTries === 'number' && Object.values(players).length === 1) {
-          maxTries = data.maxTries;
-        }
+    if (Object.keys(players).length >= 2) {
+      socket.emit('full');
+      socket.disconnect();
+      return;
+    }
+    let name, maxTriesValue;
+    if (typeof data === 'string') {
+      name = data;
+    } else if (typeof data === 'object' && data !== null) {
+      name = data.name;
+      if (typeof data.maxTries === 'number' && Object.keys(players).length === 0) {
+        maxTriesValue = data.maxTries;
       }
-      io.emit('players_update', getPlayerList());
-      // Only start game if both players are present and have names
-      if (
-        Object.values(players).length === 2 &&
-        Object.values(players).every(p => typeof p.name === 'string' && p.name)
-      ) {
-        resetGame();
-        io.emit('game_state', { roundWords, highScore, gameActive, round: roundWords.length + 1, maxTries });
-      }
+    }
+    const index = Object.keys(players).length;
+    players[socket.id] = { id: socket.id, index, name };
+    if (maxTriesValue) maxTries = maxTriesValue;
+    socket.emit('player_index', index);
+    io.emit('players_update', getPlayerList());
+    // Only start game if both players are present and have names
+    if (
+      Object.values(players).length === 2 &&
+      Object.values(players).every(p => typeof p.name === 'string' && p.name)
+    ) {
+      resetGame();
+      io.emit('game_state', { roundWords, highScore, gameActive, round: roundWords.length + 1, maxTries });
+    } else {
+      // If only one player, emit waiting state
+      io.emit('game_state', { waiting: true, gameActive: false, roundWords, highScore, round: 1, maxTries });
     }
   });
 
@@ -107,18 +105,20 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    delete players[socket.id];
-    currentWords = {};
-    gameActive = false;
-    gameStarted = false;
-    io.emit('players_update', getPlayerList());
-    // If only one player left, emit waiting state
-    if (Object.keys(players).length === 1) {
-      io.emit('game_state', { waiting: true, gameActive: false, roundWords, highScore, round: 1, maxTries });
-    } else {
-      io.emit('game_state', { roundWords, highScore, gameActive, round: roundWords.length + 1 });
+    if (players[socket.id]) {
+      delete players[socket.id];
+      currentWords = {};
+      gameActive = false;
+      gameStarted = false;
+      io.emit('players_update', getPlayerList());
+      // If only one player left, emit waiting state
+      if (Object.keys(players).length === 1) {
+        io.emit('game_state', { waiting: true, gameActive: false, roundWords, highScore, round: 1, maxTries });
+      } else {
+        io.emit('game_state', { roundWords, highScore, gameActive, round: roundWords.length + 1 });
+      }
+      console.log('Player disconnected:', socket.id, 'Current players:', Object.keys(players));
     }
-    console.log('Player disconnected:', socket.id, 'Current players:', Object.keys(players));
   });
 });
 
