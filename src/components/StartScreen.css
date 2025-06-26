@@ -273,16 +273,76 @@ body, html, #root, .start-bg {
   transform: scale(1.04);
 }
 @media (max-width: 600px) {
+  .start-content {
+    padding: 18px 2vw 18px 2vw;
+    min-width: 0;
+    max-width: 99vw;
+  }
+  .game-title {
+    font-size: 28px;
+    margin-bottom: 6px;
+  }
+  .game-desc {
+    font-size: 15px;
+    margin-bottom: 10px;
+  }
+  .tries-label, .tries-select {
+    font-size: 14px;
+  }
+  .name-input {
+    font-size: 16px;
+    padding: 10px;
+    margin-bottom: 12px;
+  }
+  .start-btn, .synergy-scoreboard-btn {
+    font-size: 16px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+  }
+  .waiting-effect {
+    font-size: 14px;
+    margin-top: 10px;
+  }
+  .dot-flashing {
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+  }
+  .start-footer {
+    font-size: 13px;
+    padding: 10px 0 4px 0;
+    gap: 2px;
+  }
+  .disclaimer {
+    font-size: 11px;
+    max-width: 98vw;
+  }
+  .bouncing-avatars {
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+  .bounce-avatar svg {
+    width: 36px;
+    height: 36px;
+  }
   .synergy-modal-card {
     min-width: 0;
     width: 98vw;
-    padding: 18px 2vw 18px 2vw;
+    padding: 12px 2vw 12px 2vw;
   }
   .synergy-modal-title {
-    font-size: 20px;
+    font-size: 16px;
+    margin-bottom: 10px;
   }
   .synergy-scoreboard-table th, .synergy-scoreboard-table td {
+    font-size: 12px;
+    padding: 5px 2px;
+  }
+  .synergy-modal-close-btn {
     font-size: 14px;
-    padding: 7px 2px;
+    padding: 8px 18px;
+    border-radius: 8px;
+    margin-top: 4px;
   }
 } 

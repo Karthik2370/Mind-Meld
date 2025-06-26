@@ -266,6 +266,120 @@ body, html, #root, .game-bg {
   }
 }
 
+@media (max-width: 600px) {
+  .game-main-layout {
+    flex-direction: column;
+    width: 99vw;
+    min-height: unset;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px #8e44ad22;
+  }
+  .game-left, .game-right {
+    min-width: unset;
+    padding: 18px 2vw 12px 2vw;
+  }
+  .game-left {
+    border-right: none;
+    border-bottom: 2px solid #e3e6f3;
+  }
+  .game-title {
+    font-size: 22px;
+    margin-bottom: 4px;
+  }
+  .high-score {
+    font-size: 14px;
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+  .synergy-best-row {
+    font-size: 13px !important;
+    margin-bottom: 6px !important;
+  }
+  .round-history-label {
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  .round-history-table th, .round-history-table td {
+    font-size: 12px;
+    padding: 6px 2px;
+  }
+  .players-row {
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .player-card {
+    border-radius: 10px;
+    padding: 8px 8px 6px 8px;
+    min-width: 60px;
+  }
+  .avatar-wrap svg {
+    width: 28px;
+    height: 28px;
+  }
+  .player-name {
+    font-size: 13px;
+  }
+  .you-badge {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 5px;
+    top: 4px;
+    right: 6px;
+  }
+  .round-label {
+    font-size: 15px;
+    margin-bottom: 8px;
+  }
+  .word-form {
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .word-input {
+    font-size: 15px;
+    padding: 8px;
+    border-radius: 8px;
+  }
+  .submit-btn, .restart-btn {
+    font-size: 15px;
+    padding: 8px 18px;
+    border-radius: 8px;
+    margin-top: 2px;
+  }
+  .waiting-msg {
+    font-size: 12px;
+    margin-top: 4px;
+  }
+  .game-over-wrap {
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .win-msg {
+    font-size: 15px;
+  }
+  .lose-msg {
+    font-size: 13px;
+  }
+  .victory-modal-card {
+    min-width: 0;
+    width: 98vw;
+    padding: 18px 2vw 18px 2vw;
+    border-radius: 16px;
+  }
+  .victory-title {
+    font-size: 20px;
+    margin-bottom: 6px;
+  }
+  .victory-word {
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+  .victory-restart-btn {
+    font-size: 15px;
+    padding: 8px 18px;
+    border-radius: 8px;
+  }
+}
+
 .victory-modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
