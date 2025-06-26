@@ -76,6 +76,28 @@ function GameScreen({ playerIndex, players, gameState, wordInput, setWordInput, 
   // Find synergy entry for you and partner
   const getSynergyKey = (a, b) => [a.trim().toLowerCase(), b.trim().toLowerCase()].sort().join('|');
   const synergyEntry = synergyScoreboard.find(entry => getSynergyKey(entry.names[0], entry.names[1]) === getSynergyKey(you, partner));
+
+  // Store synergy and high score in localStorage on victory
+  useEffect(() => {
+    if (gameState.win && you && partner && synergyEntry) {
+      try {
+        // Update synergy
+        const key = getSynergyKey(you, partner);
+        const prev = JSON.parse(localStorage.getItem('mindmeld_synergy') || '[]');
+        const prevMap = Object.fromEntries(prev.map(e => [getSynergyKey(e.names[0], e.names[1]), e]));
+        if (!prevMap[key] || synergyEntry.score < prevMap[key].score) {
+          const updated = { ...synergyEntry };
+          const newArr = prev.filter(e => getSynergyKey(e.names[0], e.names[1]) !== key).concat([updated]);
+          localStorage.setItem('mindmeld_synergy', JSON.stringify(newArr));
+        }
+        // Update high score
+        if (gameState.highScore && gameState.highScore !== '-' && (!localStorage.getItem('mindmeld_highscore') || Number(gameState.highScore) < Number(localStorage.getItem('mindmeld_highscore')))) {
+          localStorage.setItem('mindmeld_highscore', String(gameState.highScore));
+        }
+      } catch {}
+    }
+  }, [gameState.win, you, partner, synergyEntry, gameState.highScore]);
+
   return (
     <div className="game-bg">
       <div className="game-main-layout">
