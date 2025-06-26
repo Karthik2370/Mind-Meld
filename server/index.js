@@ -26,6 +26,7 @@ let currentWords = {};
 let highScore = 0;
 let gameActive = false;
 let maxTries = 0;
+let gameStarted = false;
 
 function getPlayerList() {
   return Object.values(players).map(p => ({ name: p.name, id: p.id, index: p.index }));
@@ -35,15 +36,13 @@ function resetGame() {
   roundWords = [];
   currentWords = {};
   gameActive = true;
+  gameStarted = true;
 }
 
 io.on('connection', (socket) => {
   console.log('New connection:', socket.id, 'Current players:', Object.keys(players));
   let index = Object.keys(players).length;
   if (index > 1) {
-    // Reset all players if somehow more than 2 (stale state protection)
-    players = {};
-    console.log('Too many players detected, resetting players object.');
     socket.emit('full');
     socket.disconnect();
     return;
@@ -52,22 +51,24 @@ io.on('connection', (socket) => {
   socket.emit('player_index', index);
   io.emit('players_update', getPlayerList());
 
-  // Receive name and maxTries
+  // Wait for both players to set names before starting
   socket.on('set_name', (data) => {
     if (players[socket.id]) {
-      // Accept both string and object for backward compatibility
       if (typeof data === 'string') {
         players[socket.id].name = data;
       } else if (typeof data === 'object' && data !== null) {
         players[socket.id].name = data.name;
-        // Only set maxTries if this is the first player
         if (typeof data.maxTries === 'number' && Object.values(players).length === 1) {
           maxTries = data.maxTries;
         }
       }
       io.emit('players_update', getPlayerList());
-      // Start game if both players are ready
-      if (Object.values(players).length === 2 && Object.values(players).every(p => typeof p.name === 'string' && p.name)) {
+      // Only start game if both players are present and have names
+      if (
+        Object.values(players).length === 2 &&
+        Object.values(players).every(p => typeof p.name === 'string' && p.name) &&
+        !gameActive
+      ) {
         resetGame();
         io.emit('game_state', { roundWords, highScore, gameActive, round: roundWords.length + 1, maxTries });
       }
@@ -78,14 +79,13 @@ io.on('connection', (socket) => {
   socket.on('submit_word', (word) => {
     if (!gameActive) return;
     currentWords[socket.id] = word.trim();
-    // If both players have submitted
     if (Object.keys(currentWords).length === 2) {
       const ids = Object.keys(players);
       const words = ids.map(id => currentWords[id]);
       roundWords.push(words);
-      // Check for match
       if (words[0] && words[1] && words[0].toLowerCase() === words[1].toLowerCase()) {
         gameActive = false;
+        gameStarted = false;
         if (roundWords.length > highScore) highScore = roundWords.length;
         io.emit('game_state', { roundWords, highScore, gameActive, win: true, round: roundWords.length });
       } else {
@@ -98,19 +98,31 @@ io.on('connection', (socket) => {
   });
 
   socket.on('restart', () => {
+    // Only allow restart if both players are still connected
     if (Object.values(players).length === 2) {
       resetGame();
-      io.emit('game_state', { roundWords, highScore, gameActive, round: 1 });
+      io.emit('game_state', { roundWords, highScore, gameActive, round: 1, maxTries });
     }
   });
 
   socket.on('disconnect', () => {
-    delete players[socket.id];
-    currentWords = {};
-    gameActive = false;
-    io.emit('players_update', getPlayerList());
-    io.emit('game_state', { roundWords, highScore, gameActive, round: roundWords.length + 1 });
-    console.log('Player disconnected:', socket.id, 'Current players:', Object.keys(players));
+    // Only remove player if game hasn't started or after game over
+    if (!gameActive || !gameStarted) {
+      delete players[socket.id];
+      currentWords = {};
+      gameActive = false;
+      gameStarted = false;
+      io.emit('players_update', getPlayerList());
+      io.emit('game_state', { roundWords, highScore, gameActive, round: roundWords.length + 1 });
+      console.log('Player disconnected:', socket.id, 'Current players:', Object.keys(players));
+    } else {
+      // If game is active, just mark as disconnected but keep player in list
+      if (players[socket.id]) {
+        players[socket.id].name = '';
+      }
+      io.emit('players_update', getPlayerList());
+      console.log('Player disconnected (game active):', socket.id, 'Current players:', Object.keys(players));
+    }
   });
 });
 
