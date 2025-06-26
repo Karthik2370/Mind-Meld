@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import './GameScreen.css';
 import { io } from 'socket.io-client';
+import html2canvas from 'html2canvas';
 
 const AVATARS = [
   <svg width="48" height="48" viewBox="0 0 48 48" fill="none" key="avatar1">
@@ -26,7 +27,18 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL ||
 
 const socket = io(backendUrl);
 
-function VictoryModal({ word, onRestart }) {
+function VictoryModal({ word, onRestart, roundWords, players, guesses }) {
+  // Download certificate as PNG
+  const handleDownload = async () => {
+    const cert = document.getElementById('victory-certificate');
+    if (cert) {
+      const canvas = await html2canvas(cert, { backgroundColor: '#fff', scale: 2 });
+      const link = document.createElement('a');
+      link.download = `mindmeld-certificate.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+  };
   return (
     <div className="victory-modal-overlay">
       <div className="victory-modal-card">
@@ -41,7 +53,31 @@ function VictoryModal({ word, onRestart }) {
         </div>
         <div className="victory-title">🎉 You Win!</div>
         <div className="victory-word">You both said <b>"{word}"</b></div>
+        <div id="victory-certificate" className="victory-certificate">
+          <div className="cert-heading">Mind Meld Victory Certificate</div>
+          <div className="cert-names">{players[0]?.name} &amp; {players[1]?.name}</div>
+          <div className="cert-guesses">Matched in <b>{guesses}</b> guesses</div>
+          <table className="cert-table">
+            <thead>
+              <tr>
+                <th>Round</th>
+                <th>{players[0]?.name || 'Player 1'}</th>
+                <th>{players[1]?.name || 'Player 2'}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {roundWords.map((words, i) => (
+                <tr key={i}>
+                  <td>{i + 1}</td>
+                  <td>{words[0]}</td>
+                  <td>{words[1]}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <button className="victory-restart-btn" onClick={onRestart}>Play Again</button>
+        <button className="victory-download-btn" onClick={handleDownload}>Download Certificate</button>
       </div>
     </div>
   );
@@ -175,7 +211,13 @@ function GameScreen({ playerIndex, players, gameState, wordInput, setWordInput, 
         </div>
       </div>
       {isVictory && (
-        <VictoryModal word={gameState.roundWords[gameState.roundWords.length-1]?.[0]} onRestart={handleRestart} />
+        <VictoryModal
+          word={gameState.roundWords[gameState.roundWords.length-1]?.[0]}
+          onRestart={handleRestart}
+          roundWords={gameState.roundWords}
+          players={players}
+          guesses={gameState.roundWords.length}
+        />
       )}
     </div>
   );

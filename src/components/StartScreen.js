@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './StartScreen.css';
 
 const AVATARS = [
@@ -69,6 +69,23 @@ function SynergyScoreboardModal({ open, onClose, synergyScoreboard }) {
 function StartScreen({ nameInput, setNameInput, setName, maxTries, setMaxTries, players, waiting, synergyScoreboard }) {
   const [modalOpen, setModalOpen] = useState(false);
   const waitingForPlayer = players.length === 1 || waiting;
+
+  // Autofill name from localStorage on mount
+  useEffect(() => {
+    const savedName = localStorage.getItem('mindmeld_username');
+    if (savedName && !nameInput) {
+      setNameInput(savedName);
+    }
+  }, []);
+
+  // Save name to localStorage on first entry
+  function handleSetName() {
+    if (nameInput.trim()) {
+      localStorage.setItem('mindmeld_username', nameInput.trim());
+      setName(nameInput.trim());
+    }
+  }
+
   return (
     <div className="start-bg">
       <div className="start-content">
@@ -94,13 +111,13 @@ function StartScreen({ nameInput, setNameInput, setName, maxTries, setMaxTries, 
           value={nameInput}
           maxLength={16}
           onChange={e => setNameInput(e.target.value)}
-          onKeyDown={e => { if (e.key === 'Enter' && nameInput.trim()) setName(nameInput.trim()); }}
+          onKeyDown={e => { if (e.key === 'Enter' && nameInput.trim()) handleSetName(); }}
           autoFocus
         />
         <button
           className="start-btn"
           disabled={!nameInput.trim()}
-          onClick={() => setName(nameInput.trim())}
+          onClick={handleSetName}
         >
           Start Game
         </button>

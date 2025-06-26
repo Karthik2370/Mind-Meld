@@ -450,4 +450,103 @@ body, html, #root, .game-bg {
 .victory-restart-btn:hover {
   background: linear-gradient(90deg,#8e44ad,#e67e22);
   transform: scale(1.04);
+}
+
+.victory-certificate {
+  background: #fff;
+  border: 3px solid #8e44ad;
+  border-radius: 18px;
+  padding: 18px 12px 12px 12px;
+  margin: 18px 0 12px 0;
+  box-shadow: 0 2px 16px #8e44ad22;
+  text-align: center;
+  width: 340px;
+  max-width: 90vw;
+  font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+}
+.cert-heading {
+  font-size: 22px;
+  font-weight: 900;
+  color: #8e44ad;
+  margin-bottom: 6px;
+  letter-spacing: 1px;
+}
+.cert-names {
+  font-size: 16px;
+  font-weight: 700;
+  color: #e67e22;
+  margin-bottom: 4px;
+}
+.cert-guesses {
+  font-size: 15px;
+  color: #27ae60;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.cert-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 auto;
+  font-size: 14px;
+}
+.cert-table th, .cert-table td {
+  border: 1px solid #e3e6f3;
+  padding: 5px 8px;
+  text-align: center;
+}
+.cert-table th {
+  background: #f3e6ff;
+  color: #8e44ad;
+  font-weight: 900;
+}
+.cert-table tr:nth-child(even) {
+  background: #f8f8fa;
+}
+.cert-table tr:nth-child(odd) {
+  background: #fff;
+}
+.victory-download-btn {
+  font-size: 18px;
+  padding: 10px 32px;
+  border-radius: 12px;
+  background: linear-gradient(90deg,#27ae60,#8e44ad);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 900;
+  box-shadow: 0 2px 12px #27ae6040;
+  letter-spacing: 1px;
+  margin-top: 10px;
+  margin-bottom: 2px;
+  transition: background 0.2s, transform 0.2s;
+}
+.victory-download-btn:hover {
+  background: linear-gradient(90deg,#8e44ad,#27ae60);
+  transform: scale(1.04);
+}
+@media (max-width: 600px) {
+  .victory-certificate {
+    width: 98vw;
+    min-width: 0;
+    padding: 8px 2vw 8px 2vw;
+    font-size: 12px;
+  }
+  .cert-heading {
+    font-size: 15px;
+  }
+  .cert-names {
+    font-size: 12px;
+  }
+  .cert-guesses {
+    font-size: 11px;
+  }
+  .cert-table {
+    font-size: 10px;
+  }
+  .victory-download-btn {
+    font-size: 13px;
+    padding: 7px 12px;
+    border-radius: 8px;
+    margin-top: 6px;
+  }
 } 
