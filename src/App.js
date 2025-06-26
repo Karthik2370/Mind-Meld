@@ -3,7 +3,11 @@ import StartScreen from './components/StartScreen';
 import GameScreen from './components/GameScreen';
 import { io } from 'socket.io-client';
 
-const SERVER_URL = 'http://localhost:4000';
+const SERVER_URL =
+  process.env.REACT_APP_BACKEND_URL ||
+  (window.location.hostname === 'localhost'
+    ? 'http://localhost:3001'
+    : window.location.origin);
 
 function App() {
   const [playerIndex, setPlayerIndex] = useState(null);
